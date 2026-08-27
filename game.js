@@ -102,18 +102,36 @@ const displayEvent = (character, event) => {
     for(let i = 0; i < event.choices.length; i++) {
         const button = document.createElement("button")
         button.textContent = event.choices[i].text
+        button.addEventListener("click", (e) => {
+            e.preventDefault()
+
+            const optionChosen = event.choices[i]
+
+            applyEffects(character, optionChosen.effects)
+            updateStatsDisplay(character)
+        })
         eventOptions.appendChild(button)
     }
-
-    applyEffects(character, event)
-
-    characterPhysique.textContent = character.stats.physique
-    characterSagesse.textContent = character.stats.sagesse
-    characterIntuition.textContent = character.stats.intuition
+    
+    updateStatsDisplay(character)
 }
 
 const applyEffects = (character, effects) => {
-    console.log(Object.entries(effects.choices))
+
+    const statsEvent = effects.stats
+    
+    for(const [key, value] of Object.entries(statsEvent)) {
+        const nameStatToAdd = key
+        const valueStatToAdd = value
+
+        character.stats[nameStatToAdd] += valueStatToAdd
+    }
+}
+
+const updateStatsDisplay = (character) => {
+    characterPhysique.textContent = character.stats.physique
+    characterSagesse.textContent = character.stats.sagesse
+    characterIntuition.textContent = character.stats.intuition
 }
 
 displayEvent(characterState, firstEvent)
