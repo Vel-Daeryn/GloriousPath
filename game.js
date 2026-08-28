@@ -17,6 +17,7 @@ const firstEvent = {
     id: "naissance",
     title: "Naissance",
     age: 0,
+    timeProgression: 1,
     location: {
         name: "Nom de lieu Test",
         image: "https://img.magnific.com/premium-vector/vector-black-white-image-medieval-knight-armor_983400-1778.jpg?semt=ais_hybrid&w=740&q=80",
@@ -56,6 +57,11 @@ const firstEvent = {
             },
             flags: {
                 surnom: "Solide petit Gaillard"
+            },
+            history: {
+                id: "title_solide_petit_gaillard",
+                title: "Solide Petit Gaillard",
+                desc: "Avant même votre premier cri, vous montriez une résilience rare."
             }
         }
     }
@@ -80,8 +86,6 @@ const characterIntuition = document.getElementById("intuition")
 /* ---- Game Functions ---- */
 
 const displayEvent = (character, event) => {
-    characterName.textContent = character.name
-    characterAge.textContent = `${character.age} ans`
 
     locationName.textContent = event.location.name
     locationImg.src = event.location.image
@@ -107,25 +111,48 @@ const displayEvent = (character, event) => {
 
             const optionChosen = event.choices[i]
 
-            applyEffects(character, optionChosen.effects)
-            updateStatsDisplay(character)
+            applyEffects(character, optionChosen.effects, event)
+            updateTime(character, optionChosen, event)
+            updateInfoDisplay(character)
+            updateYourStory(character, optionChosen.effects)
+            for(let i = 0; i < eventOptions.children.length; i++){
+                eventOptions.children[i].disabled = true
+            }
         })
         eventOptions.appendChild(button)
     }
-    
-    updateStatsDisplay(character)
+
+    updateInfoDisplay(character)
 }
 
 const applyEffects = (character, effects) => {
 
     const statsEvent = effects.stats
-    
-    for(const [key, value] of Object.entries(statsEvent)) {
-        const nameStatToAdd = key
-        const valueStatToAdd = value
 
-        character.stats[nameStatToAdd] += valueStatToAdd
+    if(statsEvent !== undefined) {
+        for(const [key, value] of Object.entries(statsEvent)) {
+            const nameStatToAdd = key
+            const valueStatToAdd = value
+    
+            character.stats[nameStatToAdd] += valueStatToAdd
+        }
+    
     }
+  
+}
+
+const updateTime = (character, choice, option) => {
+    
+    if(choice.timeProgression !== undefined && choice.timeProgression !== null) {
+        character.age += choice.timeProgression
+        console.log(choice.timeProgression)
+        
+    } else if(option.timeProgression !== undefined && option.timeProgression !== null) {
+        character.age += option.timeProgression
+        console.log(option.timeProgression)
+        
+    }
+    
 }
 
 const updateStatsDisplay = (character) => {
@@ -134,5 +161,21 @@ const updateStatsDisplay = (character) => {
     characterIntuition.textContent = character.stats.intuition
 }
 
-displayEvent(characterState, firstEvent)
+const updateCharacterDisplay = (character) => {
+    characterName.textContent = character.name
 
+    characterAge.textContent = character.age > 1 ? `${character.age} ans` : `${character.age} an`
+}
+
+const updateInfoDisplay = (character) => {
+    updateStatsDisplay(character)
+    updateCharacterDisplay(character)
+}
+
+const updateYourStory = (character, option) => {
+    if(option.history !== undefined){
+        character.history.push(option.history)
+    }
+}
+
+displayEvent(characterState, firstEvent)
